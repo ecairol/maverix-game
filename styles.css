@@ -4,8 +4,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    background-color: #f7f7f7;
+    min-height: 96vh;
+    background-image: url('assets/bg-1.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .game-container {

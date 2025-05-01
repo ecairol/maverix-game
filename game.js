@@ -52,15 +52,24 @@ class Game {
             }
         };
 
-        // Add character colors
+        // Add image loading for all characters
+        this.bikerImages = {};
         this.characters = [
-            { color: '#00FF00', name: 'Green' },
-            { color: '#0000FF', name: 'Blue' },
-            { color: '#FF69B4', name: 'Pink' },
-            { color: '#FFA500', name: 'Orange' },
-            { color: '#000000', name: 'Black' },
-            { color: '#FF0000', name: 'Red' }
+            { name: 'Tomi', image: 'biker1-tomi.png' },
+            { name: 'Pipe', image: 'biker2-pipe.png' },
+            { name: 'Fio', image: 'biker3-fio.png' },
+            { name: 'Ema', image: 'biker4-ema.png' },
+            { name: 'Gigi', image: 'biker5-gigi.png' },
+            { name: 'Lola', image: 'biker6-lola.png' }
         ];
+
+        // Load all character images
+        this.characters.forEach(character => {
+            const img = new Image();
+            img.src = `assets/${character.image}`;
+            this.bikerImages[character.name] = img;
+        });
+
         this.selectedCharacter = null;
 
         // Add button properties
@@ -306,9 +315,9 @@ class Game {
             this.ctx.lineTo(this.canvas.width, this.groundY + 30);
             this.ctx.stroke();
 
-            // Draw biker with selected color
-            this.ctx.fillStyle = this.selectedCharacter ? this.selectedCharacter.color : '#000';
-            this.ctx.fillRect(
+            // Draw biker using selected character's image
+            this.ctx.drawImage(
+                this.bikerImages[this.selectedCharacter.name],
                 this.biker.x,
                 this.biker.y,
                 this.biker.width,
@@ -356,9 +365,14 @@ class Game {
             const x = startX + col * (characterWidth + padding);
             const y = startY + row * (characterHeight + padding);
 
-            // Draw character box
-            this.ctx.fillStyle = character.color;
-            this.ctx.fillRect(x, y, characterWidth, characterHeight);
+            // Draw character image
+            this.ctx.drawImage(
+                this.bikerImages[character.name],
+                x,
+                y,
+                characterWidth,
+                characterHeight
+            );
 
             // Draw selection border if this is the selected character
             if (i === this.selectedCharacterIndex) {
