@@ -247,7 +247,13 @@ class Game {
     }
 
     update() {
+        // Only update if we're in PLAYING state AND have a selected character
+        if (this.currentState !== this.gameState.PLAYING || !this.selectedCharacter) return;
         if (this.currentState === this.gameState.GAME_OVER) return;
+
+        const song = document.getElementById('song');
+        song.volume = 0.2;
+        song.play();
 
         // Update biker position
         if (this.biker.jumping) {
@@ -271,9 +277,7 @@ class Game {
         // Move obstacles and check for collisions
         for (let i = this.obstacles.length - 1; i >= 0; i--) {
             const obstacle = this.obstacles[i];
-            // Use the selected character's speed for obstacle movement, or default to 5 if no character selected
-            const speed = this.selectedCharacter ? this.selectedCharacter.speed : 5;
-            obstacle.x -= speed;
+            obstacle.x -= this.selectedCharacter.speed;
 
             // Check for collision
             if (this.checkCollision(this.biker, obstacle)) {
@@ -301,7 +305,7 @@ class Game {
 
         if (this.currentState === this.gameState.CHARACTER_SELECT) {
             this.drawCharacterSelect();
-        } else {
+        } else if (this.selectedCharacter) {  // Only draw game elements if we have a selected character
             // Draw ground
             this.ctx.beginPath();
             this.ctx.moveTo(0, this.groundY + 30);
@@ -343,7 +347,7 @@ class Game {
         this.ctx.fillStyle = '#000';
         this.ctx.font = '30px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('Select Your Character', this.canvas.width / 2, 50);
+        this.ctx.fillText('Seleccione un jugador:', this.canvas.width / 2, 50);
 
         // Draw character options
         const characterWidth = 80;
@@ -384,7 +388,7 @@ class Game {
         // Draw instructions
         this.ctx.fillStyle = '#000';
         this.ctx.font = '10px Arial';
-        this.ctx.fillText('Use las teclas para mover, Enter para seleccionar', this.canvas.width / 2, this.canvas.height - 30);
+        this.ctx.fillText('ESPACIO PARA SALTAR', this.canvas.width / 2, this.canvas.height - 15);
     }
 
     drawButton() {
