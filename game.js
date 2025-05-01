@@ -52,15 +52,15 @@ class Game {
             }
         };
 
-        // Add image loading for all characters
+        // Add image loading for all characters with speed attributes
         this.bikerImages = {};
         this.characters = [
-            { name: 'Tomi', image: 'biker1-tomi.png' },
-            { name: 'Pipe', image: 'biker2-pipe.png' },
-            { name: 'Fio', image: 'biker3-fio.png' },
-            { name: 'Ema', image: 'biker4-ema.png' },
-            { name: 'Gigi', image: 'biker5-gigi.png' },
-            { name: 'Lola', image: 'biker6-lola.png' }
+            { name: 'Tomi', image: 'biker1-tomi.png', speed: 7 },    // Base speed
+            { name: 'Pipe', image: 'biker2-pipe.png', speed: 7 },    // Faster
+            { name: 'Fio', image: 'biker3-fio.png', speed: 7 },      // Slower
+            { name: 'Ema', image: 'biker4-ema.png', speed: 7 },    // Slightly faster
+            { name: 'Gigi', image: 'biker5-gigi.png', speed: 7 },  // Slightly slower
+            { name: 'Lola', image: 'biker6-lola.png', speed: 12 }   // Slightly faster
         ];
 
         // Load all character images
@@ -129,34 +129,25 @@ class Game {
 
     handleKeyDown(event) {
         if (this.currentState === this.gameState.CHARACTER_SELECT) {
-            const now = Date.now();
-            
-            // Only process arrow keys if enough time has passed (for smooth movement)
-            if (now - this.keys.arrow.lastPressed > 150) {
-                switch(event.code) {
-                    case 'ArrowRight':
-                        this.selectedCharacterIndex = (this.selectedCharacterIndex + 1) % this.characters.length;
-                        this.keys.arrow.lastPressed = now;
-                        break;
-                    case 'ArrowLeft':
-                        this.selectedCharacterIndex = (this.selectedCharacterIndex - 1 + this.characters.length) % this.characters.length;
-                        this.keys.arrow.lastPressed = now;
-                        break;
-                    case 'ArrowUp':
-                        this.selectedCharacterIndex = (this.selectedCharacterIndex - 3 + this.characters.length) % this.characters.length;
-                        this.keys.arrow.lastPressed = now;
-                        break;
-                    case 'ArrowDown':
-                        this.selectedCharacterIndex = (this.selectedCharacterIndex + 3) % this.characters.length;
-                        this.keys.arrow.lastPressed = now;
-                        break;
-                    case 'Space':
-                    case 'Enter':
-                        this.selectedCharacter = this.characters[this.selectedCharacterIndex];
-                        this.currentState = this.gameState.PLAYING;
-                        this.reset();
-                        break;
-                }
+            switch(event.code) {
+                case 'ArrowRight':
+                    this.selectedCharacterIndex = (this.selectedCharacterIndex + 1) % this.characters.length;
+                    break;
+                case 'ArrowLeft':
+                    this.selectedCharacterIndex = (this.selectedCharacterIndex - 1 + this.characters.length) % this.characters.length;
+                    break;
+                case 'ArrowUp':
+                    this.selectedCharacterIndex = (this.selectedCharacterIndex - 3 + this.characters.length) % this.characters.length;
+                    break;
+                case 'ArrowDown':
+                    this.selectedCharacterIndex = (this.selectedCharacterIndex + 3) % this.characters.length;
+                    break;
+                case 'Space':
+                case 'Enter':
+                    this.selectedCharacter = this.characters[this.selectedCharacterIndex];
+                    this.currentState = this.gameState.PLAYING;
+                    this.reset();
+                    break;
             }
         } else if (event.code === 'Space') {
             const now = Date.now();
@@ -246,8 +237,8 @@ class Game {
         const obstacle = {
             x: this.canvas.width,
             y: this.groundY,
-            width: 25,
-            height: 20 + Math.random() * 28, // Random height between 40 and 60
+            width: 12,
+            height: 20 + Math.random() * 25, // Random height between 40 and 60
             passed: false
         };
         this.obstacles.push(obstacle);
@@ -280,7 +271,9 @@ class Game {
         // Move obstacles and check for collisions
         for (let i = this.obstacles.length - 1; i >= 0; i--) {
             const obstacle = this.obstacles[i];
-            obstacle.x -= 5;
+            // Use the selected character's speed for obstacle movement, or default to 5 if no character selected
+            const speed = this.selectedCharacter ? this.selectedCharacter.speed : 5;
+            obstacle.x -= speed;
 
             // Check for collision
             if (this.checkCollision(this.biker, obstacle)) {
@@ -383,14 +376,14 @@ class Game {
 
             // Draw character name
             this.ctx.fillStyle = '#000';
-            this.ctx.font = '14px Arial';
+            this.ctx.font = '12px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.fillText(character.name, x + characterWidth / 2, y + characterHeight + 20);
         });
 
         // Draw instructions
         this.ctx.fillStyle = '#000';
-        this.ctx.font = '16px Arial';
+        this.ctx.font = '10px Arial';
         this.ctx.fillText('Use las teclas para mover, Enter para seleccionar', this.canvas.width / 2, this.canvas.height - 30);
     }
 

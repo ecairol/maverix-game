@@ -4,11 +4,25 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 96vh;
+    
     background-image: url('assets/bg-1.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+	flex-direction: column;
+	min-height: 98vh;
+    overflow: hidden;
+}
+
+#logo {
+	max-width: 400px;
+}
+#game {
+	border: 1px solid #000;
+}
+#score {
+	font-size: 24px;
+	margin-top: 20px;
 }
 
 .game-container {
