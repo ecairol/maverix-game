@@ -6,6 +6,20 @@ class Game {
         this.isRunning = false;
         this.groundY = this.canvas.height - 50;
         
+        // Get the actual display size of the canvas
+        this.displayRatio = this.canvas.getBoundingClientRect().width / this.canvas.width;
+        
+        // Debug info
+        this.frameCount = 0;
+        this.lastDebugTime = performance.now();
+        this.debugInterval = 1000; // Log every second
+        
+        // Fixed time step variables
+        this.fixedTimeStep = 1000 / 60; // 60 updates per second
+        this.accumulator = 0;
+        this.lastTime = 0;
+        this.updateCount = 0;  // Track number of updates
+        
         // Game state
         this.biker = {
             x: 50,
@@ -55,12 +69,12 @@ class Game {
         // Add image loading for all characters with speed attributes
         this.bikerImages = {};
         this.characters = [
-            { name: 'Tomi', image: 'biker1-tomi.png', speed: 7 },    // Base speed
-            { name: 'Pipe', image: 'biker2-pipe.png', speed: 7 },    // Faster
-            { name: 'Fio', image: 'biker3-fio.png', speed: 7 },      // Slower
-            { name: 'Ema', image: 'biker4-ema.png', speed: 7 },    // Slightly faster
-            { name: 'Gigi', image: 'biker5-gigi.png', speed: 7 },  // Slightly slower
-            { name: 'Lola', image: 'biker6-lola.png', speed: 12 }   // Slightly faster
+            { name: 'Tomi', image: 'biker1-tomi.png', speed: 9 },    // Base speed
+            { name: 'Pipe', image: 'biker2-pipe.png', speed: 9 },    // Faster
+            { name: 'Fio', image: 'biker3-fio.png', speed: 9 },      // Slower
+            { name: 'Ema', image: 'biker4-ema.png', speed: 9 },    // Slightly faster
+            { name: 'Gigi', image: 'biker5-gigi.png', speed: 9 },  // Slightly slower
+            { name: 'Lola', image: 'biker6-lola.png', speed: 16 }   // Slightly faster
         ];
 
         // Load all character images
@@ -88,6 +102,9 @@ class Game {
         document.addEventListener('keyup', this.handleKeyUp.bind(this));
         this.canvas.addEventListener('click', this.handleCanvasClick.bind(this));
         this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        
+        // Add resize listener
+        window.addEventListener('resize', this.handleResize.bind(this));
         
         // Start the game loop
         this.start();
@@ -246,6 +263,56 @@ class Game {
         this.obstacleInterval = this.getRandomInterval();
     }
 
+    gameLoop(currentTime) {
+        if (!this.isRunning) return;
+
+        // Debug logging
+        this.frameCount++;
+        if (currentTime - this.lastDebugTime >= this.debugInterval) {
+            const fps = this.frameCount;
+            const rect = this.canvas.getBoundingClientRect();
+            console.log('Debug Info:', {
+                fps,
+                updatesPerSecond: this.updateCount,
+                canvasInternalWidth: this.canvas.width,
+                canvasDisplayWidth: rect.width,
+                displayRatio: this.displayRatio,
+                currentSpeed: this.selectedCharacter ? this.selectedCharacter.speed * this.displayRatio : 0,
+                devicePixelRatio: window.devicePixelRatio,
+                screenWidth: window.screen.width,
+                screenHeight: window.screen.height,
+                windowWidth: window.innerWidth,
+                windowHeight: window.innerHeight
+            });
+            this.frameCount = 0;
+            this.updateCount = 0;
+            this.lastDebugTime = currentTime;
+        }
+
+        // Calculate delta time
+        if (!this.lastTime) this.lastTime = currentTime;
+        const deltaTime = currentTime - this.lastTime;
+        this.lastTime = currentTime;
+
+        // Accumulate time
+        this.accumulator += deltaTime;
+
+        // Update game state at fixed intervals
+        let updatesThisFrame = 0;
+        while (this.accumulator >= this.fixedTimeStep && updatesThisFrame < 2) {
+            this.update();
+            this.accumulator -= this.fixedTimeStep;
+            this.updateCount++;
+            updatesThisFrame++;
+        }
+
+        // Always draw
+        this.draw();
+
+        // Continue the loop
+        requestAnimationFrame(this.gameLoop.bind(this));
+    }
+
     update() {
         // Only update if we're in PLAYING state AND have a selected character
         if (this.currentState !== this.gameState.PLAYING || !this.selectedCharacter) return;
@@ -268,16 +335,18 @@ class Game {
         }
 
         // Update obstacles
-        this.obstacleTimer += 16;
+        this.obstacleTimer += this.fixedTimeStep;
         if (this.obstacleTimer >= this.obstacleInterval) {
             this.createObstacle();
             this.obstacleTimer = 0;
+            this.obstacleInterval = this.getRandomInterval();
         }
 
         // Move obstacles and check for collisions
         for (let i = this.obstacles.length - 1; i >= 0; i--) {
             const obstacle = this.obstacles[i];
-            obstacle.x -= this.selectedCharacter.speed;
+            // Scale the speed based on the display ratio and ensure consistent speed
+            obstacle.x -= (this.selectedCharacter.speed * this.displayRatio);
 
             // Check for collision
             if (this.checkCollision(this.biker, obstacle)) {
@@ -440,17 +509,14 @@ class Game {
         this.ctx.fillText(`Puntaje: ${this.score}`, this.canvas.width / 2, this.canvas.height / 2 + 60);
     }
 
-    gameLoop() {
-        if (this.isRunning) {
-            this.update();
-            this.draw();
-            requestAnimationFrame(this.gameLoop.bind(this));
-        }
-    }
-
     start() {
         this.isRunning = true;
-        this.gameLoop();
+        requestAnimationFrame(this.gameLoop.bind(this));
+    }
+
+    // Add window resize handler
+    handleResize() {
+        this.displayRatio = this.canvas.getBoundingClientRect().width / this.canvas.width;
     }
 }
 
