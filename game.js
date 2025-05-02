@@ -69,12 +69,12 @@ class Game {
         // Add image loading for all characters with speed attributes
         this.bikerImages = {};
         this.characters = [
-            { name: 'Tomi', image: 'biker1-tomi.png', speed: 9 },    // Base speed
-            { name: 'Pipe', image: 'biker2-pipe.png', speed: 9 },    // Faster
-            { name: 'Fio', image: 'biker3-fio.png', speed: 9 },      // Slower
-            { name: 'Ema', image: 'biker4-ema.png', speed: 9 },    // Slightly faster
-            { name: 'Gigi', image: 'biker5-gigi.png', speed: 9 },  // Slightly slower
-            { name: 'Lola', image: 'biker6-lola.png', speed: 16 }   // Slightly faster
+            { name: 'Tomi', image: 'biker1-tomi.png', speed: 9 },
+            { name: 'Pipe', image: 'biker2-pipe.png', speed: 9 },
+            { name: 'Fio', image: 'biker3-fio.png', speed: 8 },
+            { name: 'Ema', image: 'biker4-ema.png', speed: 9 },
+            { name: 'Gigi', image: 'biker5-gigi.png', speed: 6 },
+            { name: 'Lola', image: 'biker6-lola.png', speed: 13 }
         ];
 
         // Load all character images
@@ -323,7 +323,7 @@ class Game {
         if (this.currentState === this.gameState.GAME_OVER) return;
 
         const song = document.getElementById('song');
-        song.volume = 0.2;
+        song.volume = 0.1;
         song.play();
 
         // Update biker position
