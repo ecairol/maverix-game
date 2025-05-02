@@ -222,7 +222,7 @@ class Game {
                 }
             }
         } else if (this.currentState === this.gameState.PLAYING || this.currentState === this.gameState.GAME_OVER) {
-            // Check if button was clicked (now works in both PLAYING and GAME_OVER states)
+            // Check if button was clicked first
             const rect = this.canvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
@@ -231,6 +231,10 @@ class Game {
                 y >= this.button.y && y <= this.button.y + this.button.height) {
                 this.currentState = this.gameState.CHARACTER_SELECT;
                 this.reset();
+            } else if (this.currentState === this.gameState.PLAYING && !this.biker.jumping) {
+                // If in playing state, not clicking the button, and not already jumping, make the biker jump
+                this.biker.jumping = true;
+                this.biker.velocity = -15;
             }
         }
     }

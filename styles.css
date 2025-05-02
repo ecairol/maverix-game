@@ -4,14 +4,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    
     background-image: url('assets/bg-1.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 	flex-direction: column;
 	min-height: 98vh;
-    overflow: hidden;
 }
 
 #logo {
