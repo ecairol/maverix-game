@@ -102,6 +102,8 @@ class Game {
         document.addEventListener('keyup', this.handleKeyUp.bind(this));
         this.canvas.addEventListener('click', this.handleCanvasClick.bind(this));
         this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        this.canvas.addEventListener('mousedown', this.handleCanvasDown.bind(this));
+        this.canvas.addEventListener('touchstart', this.handleCanvasDown.bind(this));
         
         // Add resize listener
         window.addEventListener('resize', this.handleResize.bind(this));
@@ -231,10 +233,6 @@ class Game {
                 y >= this.button.y && y <= this.button.y + this.button.height) {
                 this.currentState = this.gameState.CHARACTER_SELECT;
                 this.reset();
-            } else if (this.currentState === this.gameState.PLAYING && !this.biker.jumping) {
-                // If in playing state, not clicking the button, and not already jumping, make the biker jump
-                this.biker.jumping = true;
-                this.biker.velocity = -15;
             }
         }
     }
@@ -251,6 +249,16 @@ class Game {
                 x >= this.button.x && x <= this.button.x + this.button.width &&
                 y >= this.button.y && y <= this.button.y + this.button.height
             );
+        }
+    }
+
+    // Add new method for handling mousedown/touchstart
+    handleCanvasDown(event) {
+        if (this.currentState === this.gameState.PLAYING && !this.biker.jumping) {
+            // Prevent default to avoid double-triggering on mobile
+            event.preventDefault();
+            this.biker.jumping = true;
+            this.biker.velocity = -15;
         }
     }
 
